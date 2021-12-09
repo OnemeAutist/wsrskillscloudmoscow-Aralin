@@ -1,1 +1,1 @@
-ansible-playbook playbook.yml -i hosts.ini --sudo --ask-vault-pass
+ansible-playbook playbook.yml -i hosts.ini --ask-pass --sudo
