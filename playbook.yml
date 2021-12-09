@@ -29,6 +29,7 @@
     rule: allow
     port:1467
     proto: tcp
+    notify: Restart UFW
   - name: Create a directory
   ansible.builtin.file:
     path: /skillscloud-ngsite
@@ -67,6 +68,9 @@
       name: "nginx"
       state: "latest"
       update_cache: yes
+      notify: 
+        - Start nginx
+        - Enable nginx
   - name: "SSH Port"
     lineinfile:
      dest: "/etc/ssh/sshd_config"
@@ -77,9 +81,6 @@
       dest: "/etc/ssh/sshd_config"
       regexp: "^PubkeyAuthentication"
       line: "PubkeyAuthentication yes"
-  - name: "Set SSH Port"
-     set_fact:
-      ansible_port: 1467
    - name: Install dependencies
       apt:
         name: "{{ packages }}"
@@ -126,14 +127,18 @@
         command: mv ~/docker-compose /usr/local/bin/docker-compose
         when: docker_compose.stat.exists
     - name: Execute docker.sh
-      ansible.builtin.shell: /skillscloud-ngsite/docker-compose.sh      
+      ansible.builtin.shell: /skillscloud-ngsite/docker-compose.sh
+    - name: "Set SSH Port"
+     set_fact:
+      ansible_port: 1467
+     notify: - Restart sshd
   handlers:
-    - name: "Restart sshd"
-   service:
-    name: sshd
-    state: restarted
-  - name: "Start nginx"
+    - name: Restart sshd
+   service: name=sshd state=restarted
+  - name: Start nginx
     service: name=nginx state=started
-  - name: "Enable nginx"
+  - name: Enable nginx
     service: name=nginx state=enabled
+  - name: Restart UFW
+    service: name=ufw state=restarted
     
