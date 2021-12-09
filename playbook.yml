@@ -2,12 +2,57 @@
 - hosts: "all"
   become: true
   tasks:
+  - ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+  - ufw:
+    rule: allow
+    port: 80
+    proto: udp
+  - ufw:
+    rule: allow
+    port: 8880
+    proto: tcp
+  - ufw:
+    rule: allow
+    port: 8880
+    proto:udp
+  - ufw:
+    rule: allow
+    port: 1467
+    proto: tcp
+  - ufw:
+    rule: allow
+    port:1467
+    proto: tcp
+  - name: "Upgrade all apt packages"
+    apt: upgrade=dist force_apt_get=yes
+  - name: "Install curl"
+    ansible.builtin.apt:
+      name: "curl"
+      state: "latest"
+      update_cache: true
   - name: "Install nginx"
     ansible.builtin.apt:
       name: "nginx"
       state: "latest"
       update_cache: true
+  - name: "SSH Port"
+    lineinfile:
+     dest: "/etc/ssh/sshd_config"
+     regexp: "^Port"
+     line: "Port 1467"
+  - name: "Set SSH Port"
+     set_fact:
+      ansible_port: 1467
   handlers:
+    - name: "Restart sshd"
+   service:
+    name: sshd
+    state: restarted
   - name: "Start nginx"
     service: name=nginx state=started
+  - name: "Enable nginx"
+    service: name=nginx state=enabled
     
