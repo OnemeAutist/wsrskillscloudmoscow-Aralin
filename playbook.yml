@@ -15,11 +15,11 @@
     proto: udp
   - ufw:
     rule: allow
-    port: 8880
+    port: 8888
     proto: tcp
   - ufw:
     rule: allow
-    port: 8880
+    port: 8888
     proto:udp
   - ufw:
     rule: allow
