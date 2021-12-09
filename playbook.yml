@@ -29,18 +29,18 @@
     rule: allow
     port:1467
     proto: tcp
-  - name: "Upgrade all apt packages"
-    apt: upgrade=dist force_apt_get=yes
+  - name: "Apt update"
+    apt: update_cache: yes
   - name: "Install curl"
     ansible.builtin.apt:
       name: "curl"
       state: "latest"
-      update_cache: true
+      update_cache: yes
   - name: "Install nginx"
     ansible.builtin.apt:
       name: "nginx"
       state: "latest"
-      update_cache: true
+      update_cache: yes
   - name: "SSH Port"
     lineinfile:
      dest: "/etc/ssh/sshd_config"
