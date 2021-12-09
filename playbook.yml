@@ -32,9 +32,24 @@
   - name: Clone a github repository
       git:
        repo: https://github.com/Jeniston14/wsr-skillcloud-moscow.git
-       dest: /
+       dest: /skillscloud-ngsite/
        clone: yes
        update: yes
+  - name: "Balancer project 1"
+    lineinfile:
+     dest: "/skillscloud-ngiste/balance.conf"
+     regexp: "^server {{ IP_address_project_1 }}:8888"
+     line: "server {{ 192.168.100.241 }}:8888"
+  - name: "Balancer project 2"
+    lineinfile:
+     dest: "/skillscloud-ngiste/balance.conf"
+     regexp: "^server {{ IP_address_project_2 }}:8888"
+     line: "server {{ 192.168.100.158 }}:8888"
+  - name: "Balancer project 1"
+    lineinfile:
+     dest: "/skillscloud-ngiste/balance.conf"
+     regexp: "^server {{ IP_address_project_3 }}:8888"
+     line: "server {{ 192.168.100.148 }}:8888"  
   - name: "Apt update"
     apt: update_cache: yes
   - name: "Install curl"
@@ -60,6 +75,51 @@
   - name: "Set SSH Port"
      set_fact:
       ansible_port: 1467
+   - name: Install dependencies
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+        - gnupg-agent   
+    - name: Add an apt signing key for Docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: Add apt repository for stable version
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+    - name: Install Docker
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+        - docker-ce
+        - docker-ce-cli 
+        - containerd.io
+    - name: Add user to docker group
+      user:
+        name: "{{ansible_user}}"
+        group: docker
+    - name: Download docker-compose {{ docker_compose_version }}
+      get_url:
+        url : https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+        dest: ~/docker-compose
+        mode: '+x'
+    - name: Check docker-compose exists
+      stat: path=~/docker-compose
+      register: docker_compose
+    - name: Move docker-compose to /usr/local/bin/docker-compose
+      command: mv ~/docker-compose /usr/local/bin/docker-compose
+      when: docker_compose.stat.exists
   handlers:
     - name: "Restart sshd"
    service:
