@@ -132,6 +132,8 @@
      set_fact:
       ansible_port: 1467
      notify: - Restart sshd
+    - name: "Restart machine"
+      reboot:
   handlers:
     - name: Restart sshd
    service: name=sshd state=restarted
