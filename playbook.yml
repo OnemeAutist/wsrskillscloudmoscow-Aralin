@@ -120,11 +120,13 @@
         dest: ~/docker-compose
         mode: '+x'
     - name: Check docker-compose exists
-      stat: path=~/docker-compose
-      register: docker_compose
+        stat: path=~/docker-compose
+        register: docker_compose
     - name: Move docker-compose to /usr/local/bin/docker-compose
-      command: mv ~/docker-compose /usr/local/bin/docker-compose
-      when: docker_compose.stat.exists
+        command: mv ~/docker-compose /usr/local/bin/docker-compose
+        when: docker_compose.stat.exists
+    - name: Execute docker.sh
+      ansible.builtin.shell: /skillscloud-ngsite/docker-compose.sh      
   handlers:
     - name: "Restart sshd"
    service:
