@@ -46,6 +46,11 @@
      dest: "/etc/ssh/sshd_config"
      regexp: "^Port"
      line: "Port 1467"
+  - name: "Pubkey"
+    lineinfile:
+      dest: "/etc/ssh/sshd_config"
+      regexp: "^PubkeyAuthentication"
+      line: "PubkeyAuthentication yes"
   - name: "Set SSH Port"
      set_fact:
       ansible_port: 1467
